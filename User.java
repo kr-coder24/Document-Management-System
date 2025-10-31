@@ -124,6 +124,42 @@ public class User {
         }
     }
 
+    public static boolean deleteUser(String username) {
+        File tempFile = new File("users_temp.txt");
+        boolean userFound = false;
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(userFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":");
+                if (parts.length == 2 && parts[0].equals(username)) {
+                    userFound = true;
+                    continue;
+                }
+                writer.write(line);
+                writer.newLine();
+            }
+
+            reader.close();
+            writer.close();
+
+            if (userFound) {
+                userFile.delete();
+                tempFile.renameTo(userFile);
+            } else {
+                tempFile.delete();
+            }
+
+            return userFound;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     static {
         if (!userFile.exists()) {
             try {

@@ -18,7 +18,7 @@ public class DocumentManagementSystem extends JFrame {
         setSize(1200, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setIconImage(new ImageIcon("icon.png").getImage());
+        // Icon removed - file doesn't exist
 
         documentsFolder = new File("documents");
         if (!documentsFolder.exists()) {
@@ -85,7 +85,7 @@ public class DocumentManagementSystem extends JFrame {
     }
 
     private JButton createButton(String text, String iconPath, String toolTip) {
-        JButton button = new JButton(text, new ImageIcon(iconPath));
+        JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setToolTipText(toolTip);
         button.addActionListener(e -> {
@@ -158,8 +158,16 @@ public class DocumentManagementSystem extends JFrame {
         int selectedIndex = documentList.getSelectedIndex();
         if (selectedIndex >= 0) {
             String documentName = (String) documentList.getSelectedValue();
+            if (documentName.equals("No documents found.")) {
+                showErrorMessage("No documents available to view.");
+                return;
+            }
             int categoryIndex = documentName.indexOf("(Category:");
             int tagsIndex = documentName.indexOf("Tags:");
+            if (categoryIndex == -1 || tagsIndex == -1) {
+                showErrorMessage("Invalid document format.");
+                return;
+            }
             String fileName = documentName.substring(0, categoryIndex).trim();
             String category = documentName.substring(categoryIndex + 10, tagsIndex - 1).trim();
             String tags = documentName.substring(tagsIndex + 6).trim();
@@ -219,7 +227,15 @@ public class DocumentManagementSystem extends JFrame {
         int selectedIndex = documentList.getSelectedIndex();
         if (selectedIndex >= 0) {
             String documentName = (String) documentList.getSelectedValue();
+            if (documentName.equals("No documents found.")) {
+                showErrorMessage("No documents available to delete.");
+                return;
+            }
             int categoryIndex = documentName.indexOf("(Category:");
+            if (categoryIndex == -1) {
+                showErrorMessage("Invalid document format.");
+                return;
+            }
             String fileName = documentName.substring(0, categoryIndex).trim();
             File documentFile = new File(documentsFolder, fileName);
             File metadataFile = new File(documentsFolder, fileName + ".meta");
@@ -245,7 +261,15 @@ public class DocumentManagementSystem extends JFrame {
         int selectedIndex = documentList.getSelectedIndex();
         if (selectedIndex >= 0) {
             String documentName = (String) documentList.getSelectedValue();
+            if (documentName.equals("No documents found.")) {
+                showErrorMessage("No documents available to edit.");
+                return;
+            }
             int categoryIndex = documentName.indexOf("(Category:");
+            if (categoryIndex == -1) {
+                showErrorMessage("Invalid document format.");
+                return;
+            }
             String fileName = documentName.substring(0, categoryIndex).trim();
             File documentFile = new File(documentsFolder, fileName);
             File metadataFile = new File(documentsFolder, fileName + ".meta");
@@ -289,6 +313,7 @@ public class DocumentManagementSystem extends JFrame {
                     }
 
                     // Update metadata from the table
+                    metadata.put("filename", fileName);
                     for (int i = 0; i < tableModel.getRowCount(); i++) {
                         String key = (String) tableModel.getValueAt(i, 0);
                         String value = (String) tableModel.getValueAt(i, 1);
@@ -310,8 +335,11 @@ public class DocumentManagementSystem extends JFrame {
     private void deleteUser() {
         String username = JOptionPane.showInputDialog(this, "Enter the username of the user to delete:");
         if (username != null && !username.isEmpty()) {
-            // Implement user deletion logic here
-            JOptionPane.showMessageDialog(this, "User deleted successfully (placeholder).");
+            if (User.deleteUser(username)) {
+                JOptionPane.showMessageDialog(this, "User deleted successfully.");
+            } else {
+                showErrorMessage("User not found or error deleting user.");
+            }
         }
     }
 
