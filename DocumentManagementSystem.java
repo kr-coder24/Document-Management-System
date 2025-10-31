@@ -195,12 +195,15 @@ public class DocumentManagementSystem extends JFrame {
                 });
                 metadataTable.setFont(new Font("Arial", Font.PLAIN, 14));
                 metadataTable.setRowHeight(24);
+                metadataTable.setPreferredScrollableViewportSize(new Dimension(750, 100));
                 JScrollPane metadataScrollPane = new JScrollPane(metadataTable);
 
                 // Create the document content text area
                 JTextArea textArea = new JTextArea(content);
                 textArea.setEditable(false);
                 textArea.setFont(new Font("Arial", Font.PLAIN, 14));
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
                 JScrollPane contentScrollPane = new JScrollPane(textArea);
 
                 // Create the main panel and add components
@@ -211,7 +214,7 @@ public class DocumentManagementSystem extends JFrame {
 
                 // Create and show the dialog
                 JDialog viewDialog = new JDialog(this, "View Document", true);
-                viewDialog.setSize(800, 600);
+                viewDialog.setSize(900, 700);
                 viewDialog.add(mainPanel);
                 viewDialog.setLocationRelativeTo(this);
                 viewDialog.setVisible(true);
@@ -285,15 +288,24 @@ public class DocumentManagementSystem extends JFrame {
                         {"Tags", metadata.get("tags")}
                 };
 
-                DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
+                DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+                    @Override
+                    public boolean isCellEditable(int row, int column) {
+                        return column == 1;
+                    }
+                };
                 JTable metadataTable = new JTable(tableModel);
                 metadataTable.setFont(new Font("Arial", Font.PLAIN, 14));
                 metadataTable.setRowHeight(24);
+                metadataTable.setPreferredScrollableViewportSize(new Dimension(600, 100));
                 JScrollPane metadataScrollPane = new JScrollPane(metadataTable);
 
                 // Document content text area
                 JTextArea contentArea = new JTextArea(content);
                 contentArea.setFont(new Font("Arial", Font.PLAIN, 14));
+                contentArea.setLineWrap(true);
+                contentArea.setWrapStyleWord(true);
+                contentArea.setPreferredSize(new Dimension(600, 300));
                 JScrollPane contentScrollPane = new JScrollPane(contentArea);
 
                 // Main panel with metadata table and content area
@@ -301,6 +313,7 @@ public class DocumentManagementSystem extends JFrame {
                 mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                 mainPanel.add(metadataScrollPane, BorderLayout.NORTH);
                 mainPanel.add(contentScrollPane, BorderLayout.CENTER);
+                mainPanel.setPreferredSize(new Dimension(700, 500));
 
                 // Show confirm dialog with the edit panel
                 int result = JOptionPane.showConfirmDialog(this, mainPanel, "Edit Document", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
